@@ -1,19 +1,6 @@
 // graphql/queries.js
 import { gql } from '@apollo/client';
 
-// export const GET_ALL_USERS = gql`
-//   query GetAllUsers {
-//     getAllUsers {
-//       id
-//       name
-//       email
-//       phone
-//       profession
-//       address
-//     }
-//   }
-// `;
-
 export const GET_ALL_USERS = gql`
   query GetAllUsers($options: PageQueryOptions) {
     getAllUsers(options: $options) {
