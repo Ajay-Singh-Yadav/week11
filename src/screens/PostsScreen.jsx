@@ -1,125 +1,155 @@
-import React, { useState } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import React from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
-  Alert,
+  Image,
+  TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { useMutation } from '@apollo/client';
-import { CREATE_USER } from '../graphql/mutations';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const PostsScreen = () => {
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    age: '', // added
-    profession: '',
-    address: '',
-  });
+const FacebookProfile = () => {
+  const route = useRoute();
+  const { user } = route.params;
 
-  const [createUser, { loading }] = useMutation(CREATE_USER, {
-    onCompleted: data => {
-      Alert.alert('✅ Success', `User ${data.createUser.name} created`);
-      setForm({
-        name: '',
-        email: '',
-        phone: '',
-        age: '',
-        profession: '',
-        address: '',
-      });
-    },
-    onError: error => {
-      Alert.alert('❌ Error', error.message);
-    },
-  });
-
-  const handleChange = (key, value) => {
-    setForm({ ...form, [key]: value });
-  };
-
-  const handleSubmit = () => {
-    const { name, email, phone, age } = form;
-
-    if (!name || !email || !phone) {
-      Alert.alert('⚠️ Missing Fields', 'Name, Email, and Phone are required.');
-      return;
-    }
-
-    const input = {
-      ...form,
-      age: age ? parseInt(age) : null, // convert age to number
-    };
-
-    createUser({ variables: { input } });
-  };
-
+  const navigation = useNavigation();
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Create New User</Text>
+    <ScrollView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.menuIcon}>
+          <Icon name="menu" size={24} />
+        </TouchableOpacity>
+      </View>
 
-      {['name', 'email', 'phone', 'age', 'profession', 'address'].map(field => (
-        <TextInput
-          key={field}
-          placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-          style={styles.input}
-          value={form[field]}
-          onChangeText={value => handleChange(field, value)}
-          keyboardType={
-            field === 'age' || field === 'phone' ? 'numeric' : 'default'
-          }
+      {/* Cover Image */}
+      <View style={styles.coverContainer}>
+        <Image
+          source={require('../assets/images/Profile.jpeg')} // Replace with your profile photo
+          style={styles.profilePhoto}
         />
-      ))}
+      </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleSubmit}
-        disabled={loading}
-      >
-        <Text style={styles.buttonText}>
-          {loading ? 'Creating...' : 'Create User'}
+      {/* Profile Info */}
+      <View style={styles.profileInfo}>
+        <Text style={styles.name}>{user.name}</Text>
+        <Text style={styles.friends}>{user.profession}</Text>
+
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={styles.storyButton}
+            onPress={() =>
+              navigation.navigate('CreatePost', { userId: user.id || user._id })
+            }
+          >
+            <Text style={styles.buttonText}>+ Create Post</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.editButton}>
+            <Text style={styles.buttonText}>+ Add Story</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.locked}>🔒 You locked your profile</Text>
+      </View>
+
+      {/* Details */}
+      <View style={styles.details}>
+        <Text style={styles.detailText}>📞 {user.phone}</Text>
+        <Text style={styles.detailText}>
+          🎓 Profession <Text style={styles.bold}>{user.profession}</Text>
         </Text>
-      </TouchableOpacity>
+        <Text style={styles.detailText}>
+          🧑 Age <Text style={styles.bold}>{user.age}</Text>
+        </Text>
+
+        <Text style={styles.detailText}>
+          🏠 Lives in <Text style={styles.bold}>{user.address}</Text>
+        </Text>
+        <Text style={[styles.detailText, styles.link]}>All Posts</Text>
+      </View>
     </ScrollView>
   );
 };
 
-export default PostsScreen;
-
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flexGrow: 1,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
+  container: { backgroundColor: '#fff' },
+  header: {
+    paddingTop: 20,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
-  title: {
-    fontSize: 22,
-    fontWeight: '600',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  input: {
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-  },
-  button: {
-    backgroundColor: '#007BFF',
-    padding: 14,
-    borderRadius: 8,
+  name: { fontSize: 22, fontWeight: 'bold' },
+  menuIcon: { padding: 5 },
+
+  coverContainer: {
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 50,
+    position: 'relative',
   },
-  buttonText: {
-    color: '#fff',
+  coverPhoto: {
+    width: '100%',
+    height: 180,
+    backgroundColor: '#ccc',
+  },
+  profilePhoto: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    borderWidth: 4,
+    borderColor: '#fff',
+    position: 'absolute',
+    bottom: -55,
+  },
+
+  profileInfo: {
+    marginTop: 60,
+    alignItems: 'center',
+  },
+  friends: { color: 'gray', marginTop: 5 },
+  status: { marginTop: 5, fontSize: 15 },
+  buttonRow: {
+    flexDirection: 'row',
+    marginTop: 10,
+    gap: 10,
+  },
+  storyButton: {
+    backgroundColor: '#1877f2',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 5,
+  },
+  editButton: {
+    backgroundColor: '#d3d3d3',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 5,
+  },
+  buttonText: { color: '#fff', fontWeight: 'bold' },
+  locked: {
+    marginTop: 10,
+    color: '#1877f2',
     fontWeight: '600',
-    fontSize: 16,
+  },
+
+  details: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  detailText: {
+    fontSize: 14,
+    paddingVertical: 5,
+  },
+  bold: {
+    fontWeight: 'bold',
+  },
+  link: {
+    color: '#1877f2',
+    fontWeight: 'bold',
   },
 });
+
+export default FacebookProfile;

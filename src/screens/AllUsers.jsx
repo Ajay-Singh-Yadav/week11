@@ -27,11 +27,13 @@ import { GET_ALL_USERS } from '../graphql/queries';
 
 import { UPDATE_USER } from '../graphql/mutations';
 import { DELETE_USER } from '../graphql/mutations';
+import { useNavigation } from '@react-navigation/native';
 
 const screenHeight = Dimensions.get('window').height;
 const LIMIT = 10;
 
 const AllUsers = () => {
+  const navigation = useNavigation();
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [name, setName] = useState('');
@@ -82,10 +84,10 @@ const AllUsers = () => {
 
   const handleClearCache = async () => {
     try {
-      await client.clearStore(); // Clear Apollo cache
-      setPage(1); // ✅ Reset page
-      const { data } = await refetch(); // Refetch after cache clear
-      setUsers(data.getAllUsers.data); // ✅ Reset users list
+      await client.clearStore();
+      setPage(1);
+      const { data } = await refetch();
+      setUsers(data.getAllUsers.data);
       Alert.alert('Success', 'Apollo cache cleared.');
     } catch (err) {
       console.error('Cache clearing error:', err.message);
@@ -242,7 +244,9 @@ const AllUsers = () => {
                 <TouchableOpacity onPress={() => handleDeleteUser(item.id)}>
                   <Icon name="delete" size={27} color="#aaa" />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('Posts', { user: item })}
+                >
                   <Icon name="chevron-right" size={30} color="#aaa" />
                 </TouchableOpacity>
               </View>

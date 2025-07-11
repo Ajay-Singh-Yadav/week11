@@ -14,6 +14,18 @@ export const CREATE_USER = gql`
   }
 `;
 
+export const CREATE_POST = gql`
+  mutation CreatePost($input: PostInput!) {
+    createPost(input: $input) {
+      id
+      title
+      content
+      userId
+      createdAt
+    }
+  }
+`;
+
 export const DELETE_USER = gql`
   mutation DeleteUser($id: ID!) {
     deleteUser(id: $id)
