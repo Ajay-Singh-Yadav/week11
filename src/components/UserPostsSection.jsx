@@ -1,18 +1,12 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useQuery } from '@apollo/client';
 import { GET_POSTS_BY_USER } from '../graphql/queries';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
+
+const getRandomCount = (min = 10, max = 1000) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
 
 const UserPostsSection = ({ user }) => {
   const userId = user.id || user._id;
@@ -23,7 +17,7 @@ const UserPostsSection = ({ user }) => {
 
   useFocusEffect(
     useCallback(() => {
-      refetch(); // Refetch posts whenever this screen is focused
+      refetch();
     }, [userId]),
   );
 
@@ -32,57 +26,69 @@ const UserPostsSection = ({ user }) => {
 
   const posts = data?.getPostsByUser || [];
 
+  if (posts.length === 0) {
+    return (
+      <View style={{ padding: 20 }}>
+        <Text style={styles.infoText}>
+          📭 No posts yet. Create one to share your thoughts!
+        </Text>
+      </View>
+    );
+  }
+
   return (
-    <View
-      style={{
-        marginHorizontal: 20,
-      }}
-    >
-      {posts.map(post => (
-        <View key={post.id} style={styles.postCard}>
-          {/* Header */}
-          <View style={styles.headerRow}>
-            <Image
-              source={require('../assets/images/Profile.jpeg')}
-              style={styles.avatar}
-            />
-            <View>
-              <Text style={styles.name}>{user.name}</Text>
-              <Text style={styles.dateText}>
-                {new Date(post.createdAt).toDateString()}
-              </Text>
+    <View style={{ marginHorizontal: 20 }}>
+      {posts.map(post => {
+        const likeCount = getRandomCount(100, 900);
+        const commentCount = getRandomCount(5, 50);
+        const shareCount = getRandomCount(1, 20);
+
+        return (
+          <View key={post.id} style={styles.postCard}>
+            {/* Header */}
+            <View style={styles.headerRow}>
+              <Image
+                source={require('../assets/images/Profile.jpeg')}
+                style={styles.avatar}
+              />
+              <View>
+                <Text style={styles.name}>{user.name}</Text>
+                <Text style={styles.dateText}>
+                  {new Date(post.createdAt).toDateString()}
+                </Text>
+              </View>
+              <TouchableOpacity style={{ marginLeft: 'auto' }}>
+                <Icon name="more-horiz" size={20} color="#333" />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity style={{ marginLeft: 'auto' }}>
-              <Icon name="more-horiz" size={20} color="#333" />
-            </TouchableOpacity>
-          </View>
 
-          {/* Text */}
-          <Text style={styles.postText}>
-            {post.title || ''} {post.content}
-          </Text>
+            {/* Post Text */}
+            <Text style={styles.postText}>
+              {post.title || ''} {post.content}
+            </Text>
 
-          {/* Grid Images (up to 4) */}
-          {post.images?.length > 0 && (
-            <View style={styles.imageGrid}>
-              {post.images.slice(0, 4).map((img, index) => (
-                <Image
-                  key={index}
-                  source={{ uri: img }}
-                  style={styles.gridImage}
-                />
-              ))}
+            {/* Images Grid */}
+            {post.images?.length > 0 && (
+              <View style={styles.imageGrid}>
+                {post.images.slice(0, 4).map((img, index) => (
+                  <Image
+                    key={index}
+                    source={{ uri: img }}
+                    style={styles.gridImage}
+                  />
+                ))}
+              </View>
+            )}
+
+            {/* Footer */}
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>👍 {likeCount}</Text>
+              <Text style={styles.footerText}>💬 {commentCount} comments</Text>
+              <Text style={styles.footerText}>🔁 {shareCount} shares</Text>
             </View>
-          )}
-
-          {/* Footer: Like, Comment, Share */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>👍 590</Text>
-            <Text style={styles.footerText}>💬 14 comments</Text>
-            <Text style={styles.footerText}>🔁 3 shares</Text>
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 };
