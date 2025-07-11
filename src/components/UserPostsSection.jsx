@@ -1,5 +1,12 @@
 import React, { useCallback } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import { useQuery } from '@apollo/client';
 import { GET_POSTS_BY_USER } from '../graphql/queries';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -21,8 +28,24 @@ const UserPostsSection = ({ user }) => {
     }, [userId]),
   );
 
-  if (loading) return <Text style={styles.infoText}>Loading posts...</Text>;
-  if (error) return <Text style={styles.infoText}>Failed to load posts.</Text>;
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#1877f2" />
+        <Text style={styles.infoText}>Loading posts...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>
+          ❌ Something went wrong. Please try again later.
+        </Text>
+      </View>
+    );
+  }
 
   const posts = data?.getPostsByUser || [];
 
@@ -53,8 +76,17 @@ const UserPostsSection = ({ user }) => {
               />
               <View>
                 <Text style={styles.name}>{user.name}</Text>
+
                 <Text style={styles.dateText}>
-                  {new Date(post.createdAt).toDateString()}
+                  {post.createdAt
+                    ? new Date(post.createdAt).toLocaleString('en-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      })
+                    : 'Date not available'}
                 </Text>
               </View>
               <TouchableOpacity style={{ marginLeft: 'auto' }}>
@@ -63,9 +95,9 @@ const UserPostsSection = ({ user }) => {
             </View>
 
             {/* Post Text */}
-            <Text style={styles.postText}>
-              {post.title || ''} {post.content}
-            </Text>
+            <Text style={styles.postText}>{post.title || ''}</Text>
+
+            <Text style={styles.postText}>{post.content}</Text>
 
             {/* Images Grid */}
             {post.images?.length > 0 && (
