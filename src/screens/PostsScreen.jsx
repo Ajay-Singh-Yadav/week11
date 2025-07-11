@@ -10,11 +10,25 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import UserPostsSection from '../components/UserPostsSection';
+
+import { useQuery } from '@apollo/client';
+import { GET_POSTS_BY_USER } from '../graphql/queries';
+
 const FacebookProfile = () => {
   const route = useRoute();
   const { user } = route.params;
 
   const navigation = useNavigation();
+
+  const {
+    data,
+    loading: postsLoading,
+    error,
+  } = useQuery(GET_POSTS_BY_USER, {
+    variables: { userId: user.id || user._id },
+  });
+
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -69,6 +83,8 @@ const FacebookProfile = () => {
         </Text>
         <Text style={[styles.detailText, styles.link]}>All Posts</Text>
       </View>
+
+      <UserPostsSection user={user} />
     </ScrollView>
   );
 };
@@ -137,7 +153,7 @@ const styles = StyleSheet.create({
   details: {
     marginTop: 20,
     paddingHorizontal: 20,
-    paddingBottom: 40,
+    paddingBottom: 10,
   },
   detailText: {
     fontSize: 14,
@@ -149,6 +165,29 @@ const styles = StyleSheet.create({
   link: {
     color: '#1877f2',
     fontWeight: 'bold',
+  },
+  postCard: {
+    backgroundColor: '#f1f1f1',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 0.3,
+    borderColor: '#ccc',
+  },
+  postTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  postContent: {
+    fontSize: 14,
+    color: '#444',
+    marginBottom: 6,
+  },
+  postDate: {
+    fontSize: 12,
+    color: '#888',
+    textAlign: 'right',
   },
 });
 

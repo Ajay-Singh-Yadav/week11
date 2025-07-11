@@ -230,6 +230,29 @@ const styles = StyleSheet.create({
     marginLeft: 14,
     fontSize: 15,
   },
+  postCard: {
+    backgroundColor: '#f9f9f9',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+    borderWidth: 0.5,
+    borderColor: '#ccc',
+  },
+  postTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  postContent: {
+    fontSize: 14,
+    marginBottom: 4,
+    color: '#555',
+  },
+  postDate: {
+    fontSize: 12,
+    color: '#999',
+    textAlign: 'right',
+  },
 });
 
 export default CreatePostScreen;

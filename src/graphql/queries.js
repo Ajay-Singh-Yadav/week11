@@ -19,3 +19,14 @@ export const GET_ALL_USERS = gql`
     }
   }
 `;
+
+export const GET_POSTS_BY_USER = gql`
+  query GetPostsByUser($userId: ID!) {
+    getPostsByUser(userId: $userId) {
+      id
+      title
+      content
+      createdAt
+    }
+  }
+`;
