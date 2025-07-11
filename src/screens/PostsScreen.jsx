@@ -54,8 +54,8 @@ const FacebookProfile = () => {
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={styles.storyButton}
-            onPress={() =>
-              navigation.navigate('CreatePost', { userId: user.id || user._id })
+            onPress={
+              () => navigation.navigate('CreatePost', { user }) // passing the entire user object
             }
           >
             <Text style={styles.buttonText}>+ Create Post</Text>

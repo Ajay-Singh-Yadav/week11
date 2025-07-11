@@ -16,9 +16,12 @@ import { CREATE_POST } from '../graphql/mutations';
 
 const CreatePostScreen = () => {
   const route = useRoute();
+
   const navigation = useNavigation();
 
-  const [userId, setUserId] = useState(null);
+  const { user } = route.params;
+  const userId = user?.id || user?._id;
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
@@ -34,15 +37,6 @@ const CreatePostScreen = () => {
       alert('❌ Failed to create post');
     },
   });
-
-  // ✅ Extract userId from route safely
-  useEffect(() => {
-    if (route.params?.userId) {
-      setUserId(route.params.userId);
-    } else {
-      alert('❌ User ID is missing. Please go back.');
-    }
-  }, [route.params]);
 
   const handleCreatePost = () => {
     if (!title.trim() || !content.trim()) {
@@ -66,17 +60,6 @@ const CreatePostScreen = () => {
     });
   };
 
-  useEffect(() => {
-    const passedUserId = route.params?.userId;
-    console.log('📦 Passed userId:', passedUserId);
-
-    if (passedUserId) {
-      setUserId(passedUserId);
-    } else {
-      alert('⚠️ User ID is missing! Cannot create post.');
-    }
-  }, [route.params]);
-
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
@@ -99,7 +82,7 @@ const CreatePostScreen = () => {
           style={styles.avatar}
         />
         <View>
-          <Text style={styles.name}>Aj Yadav</Text>
+          <Text style={styles.name}>{user.name}</Text>
           <View style={styles.badges}>
             <Text style={styles.badge}>👥 Friends</Text>
             <Text style={styles.badge}>+ Album</Text>
